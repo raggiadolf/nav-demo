@@ -5,48 +5,51 @@ import {
   Text,
   ScrollView,
   View,
-  Image
+  Image,
+  FlatList
 } from "react-native";
 
 export default class HomeScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      concerts: [],
-      gotData: false
+      concerts: []
     };
   }
 
   componentDidMount() {
     fetch("http://apis.is/concerts")
       .then(res => res.json())
-      .then(res => this.setState({ gotData: true, concerts: res.results }));
+      .then(res =>
+        this.setState({
+          concerts: res.results.map((c, i) => ({ ...c, key: `${i}` }))
+        })
+      );
   }
 
-  renderConcerts = concerts =>
-    concerts.map((concert, index) => {
-      return (
-        <View style={styles.concertContainer} key={index}>
-          <Image style={styles.image} source={{ uri: concert.imageSource }} />
-          <View style={styles.infoContainer}>
-            <Text style={styles.text}>{`Who? ${concert.eventDateName}`}</Text>
-            <Text style={styles.text}>{`When? ${new Date(
-              concert.dateOfShow
-            ).toLocaleString("is-IS")}`}</Text>
-            <Text style={styles.text}>{`Where? ${concert.eventHallName}`}</Text>
-          </View>
+  renderItem = ({ item }) => {
+    return (
+      <View style={styles.concertContainer}>
+        <Image style={styles.image} source={{ uri: item.imageSource }} />
+        <View style={styles.infoContainer}>
+          <Text style={styles.text}>{`Who? ${item.eventDateName}`}</Text>
+          <Text style={styles.text}>{`When? ${new Date(
+            item.dateOfShow
+          ).toLocaleString("is-IS")}`}</Text>
+          <Text style={styles.text}>{`Where? ${item.eventHallName}`}</Text>
         </View>
-      );
-    });
+      </View>
+    );
+  };
 
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
-        {!this.state.gotData ? (
-          <ActivityIndicator size="large" />
-        ) : (
-          this.renderConcerts(this.state.concerts)
-        )}
+        <FlatList
+          data={this.state.concerts}
+          renderItem={this.renderItem}
+          ListEmptyComponent={<ActivityIndicator size="large" />}
+        />
       </ScrollView>
     );
   }
