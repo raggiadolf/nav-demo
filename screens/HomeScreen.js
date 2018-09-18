@@ -1,11 +1,29 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 export default class HomeScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      concerts: [],
+      gotData: false
+    };
+  }
+
+  componentDidMount() {
+    fetch("http://apis.is/concerts")
+      .then(res => res.json())
+      .then(res => this.setState({ gotData: true, concerts: res.results }));
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <Text>Hello, world!</Text>
+        {!this.state.gotData ? (
+          <ActivityIndicator size="large" />
+        ) : (
+          <Text>{this.state.concerts[0].eventDateName}</Text>
+        )}
       </View>
     );
   }
