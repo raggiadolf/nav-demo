@@ -6,7 +6,8 @@ import {
   ScrollView,
   View,
   Image,
-  FlatList
+  FlatList,
+  TouchableOpacity
 } from "react-native";
 
 export default class HomeScreen extends React.Component {
@@ -27,9 +28,16 @@ export default class HomeScreen extends React.Component {
       );
   }
 
+  onPress = concert => {
+    this.props.navigation.navigate("Detail", concert);
+  };
+
   renderItem = ({ item }) => {
     return (
-      <View style={styles.concertContainer}>
+      <TouchableOpacity
+        style={styles.concertContainer}
+        onPress={() => this.onPress(item)}
+      >
         <Image style={styles.image} source={{ uri: item.imageSource }} />
         <View style={styles.infoContainer}>
           <Text style={styles.text}>{`Who? ${item.eventDateName}`}</Text>
@@ -38,7 +46,7 @@ export default class HomeScreen extends React.Component {
           ).toLocaleString("is-IS")}`}</Text>
           <Text style={styles.text}>{`Where? ${item.eventHallName}`}</Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
